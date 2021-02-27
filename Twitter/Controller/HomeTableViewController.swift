@@ -76,11 +76,20 @@ class HomeTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath) as! TweetTableViewCell
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
         let imageUrl = URL(string: (user["profile_image_url_https"] as? String)!)
+        let screenName = "@" + (user["screen_name"] as? String ?? "")
+        let rtCound = tweetArray[indexPath.row]["retweet_count"] as? Int ?? 0
+        let fvCount = tweetArray[indexPath.row]["favorite_count"] as? Int ?? 0
         cell.userNameLabel.text = user["name"] as? String
         cell.tweetContentLabel.text = tweetArray[indexPath.row]["text"] as? String
+        cell.tweetContentLabel.sizeToFit()
+        cell.screenNameLabel.text = screenName
+        cell.retweetCountLabel.text = "\(rtCound)"
+        cell.favoriteCountLabel.text = "\(fvCount)"
         let data = try? Data(contentsOf: imageUrl!)
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
+            cell.profileImageView.layer.cornerRadius = cell.profileImageView.frame.size.width / 2
+            cell.profileImageView.clipsToBounds = true
         }
         
         return cell
@@ -99,3 +108,4 @@ class HomeTableViewController: UITableViewController {
 
 
 }
+
