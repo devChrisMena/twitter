@@ -12,7 +12,6 @@ class HomeTableViewController: UITableViewController {
     
     var tweetArray = [NSDictionary]()
     var numberOfTweets: Int!
-    
     let myRefreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
@@ -71,6 +70,7 @@ class HomeTableViewController: UITableViewController {
         }
     }
 
+    // Logout button pressed
     @IBAction func onLogout(_ sender: UIBarButtonItem) {
         TwitterAPICaller.client?.logout()
         //Dismiss segue and update userdefaults
@@ -78,11 +78,13 @@ class HomeTableViewController: UITableViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
+    // Construct cell 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath) as! TweetTableViewCell
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
         let imageUrl = URL(string: (user["profile_image_url_https"] as? String)!)
         let screenName = "@" + (user["screen_name"] as? String ?? "")
+        
         //let rtCound = tweetArray[indexPath.row]["retweet_count"] as? Int ?? 0
         //let fvCount = tweetArray[indexPath.row]["favorite_count"] as? Int ?? 0
         cell.userNameLabel.text = user["name"] as? String
