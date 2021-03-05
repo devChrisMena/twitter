@@ -17,11 +17,17 @@ class HomeTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadTweets()
-        
         //Pull refresh
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        tableView.estimatedRowHeight = 150
+        tableView.rowHeight = UITableView.automaticDimension
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("Calling viewDidAppear")
+        self.loadTweets()
     }
     
     //Pull tweets
@@ -77,14 +83,14 @@ class HomeTableViewController: UITableViewController {
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
         let imageUrl = URL(string: (user["profile_image_url_https"] as? String)!)
         let screenName = "@" + (user["screen_name"] as? String ?? "")
-        let rtCound = tweetArray[indexPath.row]["retweet_count"] as? Int ?? 0
-        let fvCount = tweetArray[indexPath.row]["favorite_count"] as? Int ?? 0
+        //let rtCound = tweetArray[indexPath.row]["retweet_count"] as? Int ?? 0
+        //let fvCount = tweetArray[indexPath.row]["favorite_count"] as? Int ?? 0
         cell.userNameLabel.text = user["name"] as? String
         cell.tweetContentLabel.text = tweetArray[indexPath.row]["text"] as? String
         cell.tweetContentLabel.sizeToFit()
         cell.screenNameLabel.text = screenName
-        cell.retweetCountLabel.text = "\(rtCound)"
-        cell.favoriteCountLabel.text = "\(fvCount)"
+        //cell.retweetCountLabel.text = "\(rtCound)"
+        //cell.favoriteCountLabel.text = "\(fvCount)"
         let data = try? Data(contentsOf: imageUrl!)
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
@@ -92,10 +98,15 @@ class HomeTableViewController: UITableViewController {
             cell.profileImageView.clipsToBounds = true
         }
         
+        //Favoited
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as? Bool ?? false)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as? Int ?? -1
+        //Retweeted
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as? Bool ?? false)
         return cell
     }
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
