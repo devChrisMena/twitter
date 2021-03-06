@@ -109,5 +109,23 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
         })
     }
     
+    func getBannerImage(parameters: [String:Any], success: @escaping (NSDictionary) -> (), failure: @escaping (Error) -> ()){
+        let url = "https://api.twitter.com/1.1/users/profile_banner.json"
+        TwitterAPICaller.client?.get(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success(response as! NSDictionary)
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    func getUserTweets(parameters: [String:Any], success: @escaping ([NSDictionary]) -> (), failure: @escaping (Error) -> ()) {
+        let url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
+        TwitterAPICaller.client?.get(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success(response as! [NSDictionary])
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
 }
 
