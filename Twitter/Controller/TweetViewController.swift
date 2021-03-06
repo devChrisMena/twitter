@@ -19,30 +19,7 @@ class TweetViewController: UIViewController, UITextViewDelegate {
         //Text View properties
         tweetTextView.delegate = self
         tweetTextView.becomeFirstResponder()
-        tweetTextView.layer.borderWidth = 1
-        tweetTextView.layer.borderColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 1).cgColor
-        wordCountLabel.text = "0"
-        //getImage()
-        credentials()
-    }
-    
-    func getImage() {
-        let imageUlr = UserDefaults.standard.url(forKey: "imageURL") ?? URL(string: "")
-        let data = try? Data(contentsOf: imageUlr!)
-        if let imageData = data {
-            profileImageView.image = UIImage(data: imageData)
-            profileImageView.layer.cornerRadius = profileImageView.frame.size.width / 2
-            profileImageView.clipsToBounds = true
-        }
-    }
-    
-    func credentials() {
-        let param = ["include_entities":false]
-        TwitterAPICaller.client?.getCredentials(parameters: param, success: { (user: NSDictionary) in
-            print(user["id"])
-        }, failure: { (error) in
-            print(error)
-        })
+        updateUI()
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
@@ -63,32 +40,44 @@ class TweetViewController: UIViewController, UITextViewDelegate {
         }
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
 
 extension TweetViewController {
-    func textLimit(existingText: String?, newText: String, limit: Int) -> Bool {
-        let text = existingText ?? ""
-        let isAtLimit = text.count + newText.count <= limit
-        return isAtLimit
-    }
     //Stubs
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         let currentText = textView.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
-        return updatedText.count <= 280 // Change limit based on your requirement.
+        return updatedText.count <= 280
     }
     func textViewDidChange(_ textView: UITextView) {
         wordCountLabel.text = String(textView.text.count)
+    }
+}
+
+extension TweetViewController {
+    //Functions
+    func updateUI() {
+        tweetTextView.layer.borderWidth = 1
+        tweetTextView.layer.borderColor = UIColor(red: 0.65, green: 0.65, blue: 0.65, alpha: 1).cgColor
+        tweetTextView.layer.cornerRadius = 15
+        wordCountLabel.text = "0"
+        getImage()
+    }
+    
+    func getImage() {
+        let param = ["include_entities":false]
+        TwitterAPICaller.client?.getCredentials(parameters: param, success: { (user: NSDictionary) in
+            let imageUrl = URL(string: user["profile_image_url_https"] as? String ?? "")
+            let data = try? Data(contentsOf: imageUrl!)
+            if let imageData = data {
+                self.profileImageView.image = UIImage(data: imageData)
+                self.profileImageView.layer.cornerRadius = self.profileImageView.frame.size.width / 2
+                self.profileImageView.clipsToBounds = true
+            }
+        }, failure: { (error) in
+            print(error)
+        })
     }
 }
